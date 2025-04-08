@@ -1,0 +1,45 @@
+
+.btn-brown {
+  background-color: #8B4513;
+  color: white;
+  border: none;
+}
+.btn-brown:hover{
+  background-color: #9e511b;
+}
+
+.btn-purple {
+  background-color: #6f42c1;
+  color: white;
+  border: none;
+}
+
+.btn-purple:hover {
+  background-color: #5a32a3;
+}
+
+.card {
+  border-radius: 1rem;
+  transition: transform 0.2s ;
+}
+
+.card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.badge {
+  font-size: 1em;
+  padding:0.2 1em;
+  border-radius: 1rem;
+}
+
+.list-group-item {
+  border: none;
+  padding:0.2 1em;
+}

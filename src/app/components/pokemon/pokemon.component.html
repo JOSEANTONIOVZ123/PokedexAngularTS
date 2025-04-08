@@ -1,0 +1,84 @@
+<div class="container mb-4">
+
+  <!--Hola Sergio-->
+  <h1 class="text-center mb-4" style="color: yellow;">Pokedex</h1>
+
+  <!-- Botones -->
+   <!--TODO: funcionalidad de los botones:-->
+  <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+    <button class="btn btn-dark" (click)="listaPokemons()" >Todos</button>
+    <button class="btn btn-brown"  (click)="botonesTipos('ground')">Tierra</button>
+    <button class="btn btn-primary" (click)="botonesTipos('water')">Agua</button>
+    <button class="btn btn-danger" (click)="botonesTipos('fire')">Fuego</button>
+    <button class="btn btn-info" (click)="botonesTipos('flying')">Aire</button>
+    <button class="btn btn-warning"(click)="botonBrillante()">Brillantes</button>
+    <button class="btn btn-purple" (click)="botonInutil('mewtwo')">Legendarios</button>
+  </div>
+
+  <!-- Buscador -->
+  <div class="input-group mb-4">
+    <input
+      type="text"
+      placeholder="Buscar Pokémon"
+      class="form-control"
+      [(ngModel)]="buscador"
+    />
+    <button class="btn btn-primary"  (click)="buscarPorNombre(buscador)">Buscar Pokémon</button>
+  </div>
+
+  <!-- "recycleview"-->
+  <div class="row justify-content-center">
+    @for (pokemon of listaPokemon; track pokemon.name) {
+      <div class="col-md-2">
+        <div class="card h-100 shadow-sm border-0 rounded-5">
+
+          <!-- Imagen del Pokémon -->
+          <img
+            [src]="pokemon.image"
+            class="card-img-top mx-auto"
+            [alt]="pokemon.name"
+            style="width: 150px; height: 150px; object-fit: contain;"
+          />
+
+          <!-- Datos del Pokémon -->
+          <div class="card-body text-center">
+            <h3 class="card-title text-capitalize">{{ pokemon.name }}</h3>
+
+            <!-- Tipos -->
+            <div class="mb-3">
+              <strong class="d-block">Tipos:</strong>
+              @for (type of pokemon.types;track type) {
+                <span
+                  class="badge bg-secondary me-1 text-capitalize"
+                >
+                  {{ type }}
+                </span>
+              }
+            </div>
+
+            <!-- Estadísticas -->
+            <div>
+              <strong class="d-block">Estadisticas:</strong>
+              <ul class="list-group">
+                @for (stat of pokemon.stats; track stat) {
+                  <li class="list-group-item d-flex justify-content-between">
+                    <span>{{ stat.name }}:</span> <span>{{ stat.value }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Mensaje si no hay resultados -->
+  @if (listaPokemon.length === 0) {
+    <div>
+      <p class="text-center">Aún no hay Pokémon :O</p>
+    </div>
+  }
+
+</div>
