@@ -1,18 +1,44 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+
 <div class="container mb-4">
 
   <!--Hola Sergio-->
-  <h1 class="text-center mb-4" style="color: yellow;">Pokedex</h1>
+  <h1 class="text-center mb-4" style="color: blue;">Pokedex</h1>
 
   <!-- Botones -->
    <!--TODO: funcionalidad de los botones:-->
   <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
-    <button class="btn btn-dark" (click)="listaPokemons()" >Todos</button>
-    <button class="btn btn-brown"  (click)="botonesTipos('ground')">Tierra</button>
-    <button class="btn btn-primary" (click)="botonesTipos('water')">Agua</button>
-    <button class="btn btn-danger" (click)="botonesTipos('fire')">Fuego</button>
-    <button class="btn btn-info" (click)="botonesTipos('flying')">Aire</button>
-    <button class="btn btn-warning"(click)="botonBrillante()">Brillantes</button>
-    <button class="btn btn-purple" (click)="botonInutil('mewtwo')">Legendarios</button>
+    <button class="btn btn-outline-dark" (click)="listaPokemons()">Todos</button>
+    <button class="btn btn-outline-success" (click)="botonesTipos('grass')">Planta</button>
+    <button class="btn btn-outline-secondary" (click)="botonesTipos('bug')">Bicho</button>
+    <button class="btn btn-outline-primary" (click)="botonesTipos('water')">Agua</button>
+    <button class="btn btn-outline-info" (click)="botonesTipos('ice')">Hielo</button>
+    <button class="btn btn-outline-danger" (click)="botonesTipos('fire')">Fuego</button>
+    <button class="btn btn-outline-grey text-black" (click)="botonesTipos('steel')">Acero</button>
+    <button class="btn btn-outline-brown" (click)="botonesTipos('ground')">Tierra</button>
+    <button class="btn btn-outline-primary" (click)="botonesTipos('flying')">Aire</button>
+    <button class="btn btn-outline-warning" (click)="botonesTipos('electric')">Eléctrico</button>
+    <button class="btn btn-outline-secondary" (click)="botonesTipos('normal')">Normal</button>
+    <button class="btn btn-outline-brown" (click)="botonesTipos('rock')">Roca</button>
+    <button class="btn btn-outline-danger" (click)="botonesTipos('psychic')">Psíquico</button>
+    <button class="btn btn-outline-primary" (click)="botonesTipos('dragon')">Dragón</button>
+    <button class="btn btn-outline-purple" (click)="botonesTipos('ghost')">Fantasma</button>
+    <button class="btn btn-outline-purple" (click)="botonesTipos('poison')">Veneno</button>
+    <button class="btn btn-outline-warning" (click)="botonesTipos('fighting')">Lucha</button>
+    <button class="btn btn-outline-pink" (click)="botonesTipos('fairy')">Hada</button>
+    <button class="btn btn-outline-dark"  (click)="botonesTipos('dark')">Siniestro</button>
+    <button class="btn btn-outline-warning d-flex align-items-center gap-2" (click)="Mostrarshiny()">
+      <input type="checkbox" [checked]="mostrarBrillantes" />
+      Brillantes
+    </button>
+    <button class="btn btn-outline-purple" (click)="botonLegendario()" >
+      <input type="checkbox" [checked]="mostrarLegendarios" />
+      Legendarios</button>
+
+  </div>
+  <div>
+    <p class="text-center">Bucando {{arriba}}</p>
+
   </div>
 
   <!-- Buscador -->
@@ -22,6 +48,7 @@
       placeholder="Buscar Pokémon"
       class="form-control"
       [(ngModel)]="buscador"
+      (keypress)="buscarPorNombre(buscador)"
     />
     <button class="btn btn-primary"  (click)="buscarPorNombre(buscador)">Buscar Pokémon</button>
   </div>
@@ -29,19 +56,31 @@
   <!-- "recycleview"-->
   <div class="row justify-content-center">
     @for (pokemon of listaPokemon; track pokemon.name) {
-      <div class="col-md-2">
+      <div class="col-md-3">
         <div class="card h-100 shadow-sm border-0 rounded-5">
 
           <!-- Imagen del Pokémon -->
-          <img
-            [src]="pokemon.image"
-            class="card-img-top mx-auto"
-            [alt]="pokemon.name"
-            style="width: 150px; height: 150px; object-fit: contain;"
-          />
+          @if (mostrarBrillantes && pokemon.imageshiny) {
+            <img
+              [src]="pokemon.imageshiny"
+              class="card-img-top mx-auto"
+              [alt]="pokemon.name"
+              style="width: 150px; height: 150px; object-fit: contain;"
+            />
+          } @else {
+            <img
+              [src]="pokemon.image"
+              class="card-img-top mx-auto"
+              [alt]="pokemon.name"
+              style="width: 150px; height: 150px; object-fit: contain;"
+            />
+          }
 
           <!-- Datos del Pokémon -->
           <div class="card-body text-center">
+            @if (pokemon.name == "victini") {
+            <h3 class="card-title text-capitalize">❤️El mejor pokemon🧡</h3>
+            }
             <h3 class="card-title text-capitalize">{{ pokemon.name }}</h3>
 
             <!-- Tipos -->
@@ -51,7 +90,7 @@
                 <span
                   class="badge bg-secondary me-1 text-capitalize"
                 >
-                  {{ type }}
+                  {{ tipoTraducido[type] || type }}
                 </span>
               }
             </div>
@@ -62,7 +101,7 @@
               <ul class="list-group">
                 @for (stat of pokemon.stats; track stat) {
                   <li class="list-group-item d-flex justify-content-between">
-                    <span>{{ stat.name }}:</span> <span>{{ stat.value }}</span>
+                    <span>{{ statTraducida[stat.name] ||  stat.name }}:</span> <span>{{ stat.value }}</span>
                   </li>
                 }
               </ul>

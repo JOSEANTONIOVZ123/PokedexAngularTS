@@ -1,22 +1,94 @@
+.btn-pink {
+  background-color: #f78fb3;
+  color: white;
+  border: 1px solid transparent;
+}
+
+.btn-pink:hover {
+  background-color: #f368e0;
+  color: white;
+}
+
+.btn-outline-pink {
+  background-color: transparent;
+  color: #f78fb3;
+  border: 1px solid #f78fb3;
+}
+
+.btn-outline-pink:hover {
+  background-color: #f78fb3;
+  color: white;
+}
+
 
 .btn-brown {
   background-color: #8B4513;
   color: white;
-  border: none;
+  border: 1px solid transparent;
 }
-.btn-brown:hover{
+
+.btn-brown:hover {
   background-color: #9e511b;
+  color: white;
+}
+
+.btn-outline-brown {
+  background-color: transparent;
+  color: #9e511b;
+  border: 1px solid #8B4513;
+}
+
+.btn-outline-brown:hover {
+  background-color: #8B4513;
+  color: white;
 }
 
 .btn-purple {
   background-color: #6f42c1;
   color: white;
-  border: none;
+  border: 1px solid transparent;
 }
 
 .btn-purple:hover {
   background-color: #5a32a3;
+  color: white;
 }
+
+.btn-outline-purple {
+  background-color: transparent;
+  color: #5a32a3;
+  border: 1px solid #6f42c1;
+}
+
+.btn-outline-purple:hover {
+  background-color: #6f42c1;
+  color: white;
+}
+
+.btn-grey {
+  background-color: #b8b8d0; /* gris con un toque lila, como el tipo Steel */
+  color: white;
+  border: 1px solid transparent;
+}
+
+.btn-grey:hover {
+  background-color: #a8a8c0;
+  color: white;
+}
+
+.btn-outline-grey {
+  background-color: transparent;
+  color: #b8b8d0;
+  border: 1px solid #b8b8d0;
+}
+
+.btn-outline-grey:hover {
+  background-color: #b8b8d0;
+  color: white;
+}
+
+
+
 
 .card {
   border-radius: 1rem;

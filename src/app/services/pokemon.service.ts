@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { forkJoin, map, Observable, ObservedValueOf, switchMap } from 'rxjs';
 import { Pokemon } from '../model/pokemon.model';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -12,7 +13,7 @@ export class PokemonService {
   constructor(private http: HttpClient) {}
 
   //conexion api
-  listaPokemon(limit: number = 1025): Observable<Pokemon[]>{
+  listaPokemon(limit: number = 1026): Observable<Pokemon[]>{
       return this.http.get<any>(`${this.baseUrl}/pokemon?limit=${limit}`).pipe(
         map(response => response.results),
         switchMap((results: any[]) =>{
@@ -27,8 +28,10 @@ export class PokemonService {
   pokemonPorNombre(name:string):Observable<Pokemon>{
     return this.http.get<any>(`${this.baseUrl}/pokemon/${name}`).pipe(
       map(data=>({
+        id:data.id,
         name: data.name,
         image:data.sprites?.front_default ,
+        imageshiny:data.sprites?.front_shiny,
         types:data.types.map((t:any) => t.type.name), //increible //Mapa dentro de otro mapa :O
         stats: data.stats.map((s:any) =>({
           name:s.stat.name,
@@ -47,34 +50,23 @@ export class PokemonService {
       switchMap((results: any[]) => {
         const respuesta = results.map(p => this.pokemonPorNombre(p.pokemon.name));
         return forkJoin(respuesta);
+
       })
     );
   }
 
-  pokemonPorNombre2(name:string):Observable<Pokemon>{
-    return this.http.get<any>(`${this.baseUrl}/pokemon/${name}`).pipe(
-      map(data=>({
-        name: data.name,
-        image:data.sprites?.front_shiny ,
-        types:data.types.map((t:any) => t.type.name), //increible //Mapa dentro de otro mapa :O
-        stats: data.stats.map((s:any) =>({
-          name:s.stat.name,
-          value:s.base_stat
-        }))
 
-
-      }))
-    );
+  pokemonLegendarios(id:number) {
+    return this.http.get<any>(`${this.baseUrl}/pokemon-species/${id}`);
   }
 
-  listaPokemon2(limit: number = 1025): Observable<Pokemon[]>{
-    return this.http.get<any>(`${this.baseUrl}/pokemon?limit=${limit}`).pipe(
-      map(response => response.results),
-      switchMap((results: any[]) =>{
-        const respuesta = results.map(p => this.pokemonPorNombre2(p.name)); // con esto saco la información total aprovechando PokemonPorNombre
-        return forkJoin(respuesta); //forkJoin es para que espere la informaci
-      })
-    );
-}
+
+
+
+
+
+
+
+
 
 }
