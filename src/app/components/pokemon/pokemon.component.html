@@ -2,11 +2,12 @@
 
 <div class="container mb-4">
 
-  <!--Hola Sergio-->
-  <h1 class="text-center mb-4" style="color: blue;">Pokedex</h1>
+      <img src="https://user-images.githubusercontent.com/37731582/39395092-949193b4-4ada-11e8-9f21-c049a771bbcc.png"   class="d-block mx-auto" alt="Logo Pokédex" width="200" height="200">
+
+
+
 
   <!-- Botones -->
-   <!--TODO: funcionalidad de los botones:-->
   <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
     <button class="btn btn-outline-dark" (click)="listaPokemons()">Todos</button>
     <button class="btn btn-outline-success" (click)="botonesTipos('grass')">Planta</button>
@@ -31,9 +32,24 @@
       <input type="checkbox" [checked]="mostrarBrillantes" />
       Brillantes
     </button>
-    <button class="btn btn-outline-purple" (click)="botonLegendario()" >
-      <input type="checkbox" [checked]="mostrarLegendarios" />
-      Legendarios</button>
+<!-- Botón Legendarios -->
+<button
+  class="btn btn-outline-purple"
+  (click)="botonLegendario()"
+  [disabled]="mostrarMitico">
+  <input type="checkbox" [checked]="mostrarLegendarios" disabled />
+  Legendarios
+</button>
+
+<!-- Botón Míticos -->
+<button
+  class="btn btn-outline-purple"
+  (click)="pokemonMitico()"
+  [disabled]="mostrarLegendarios">
+  <input type="checkbox" [checked]="mostrarMitico" disabled />
+  Miticos
+</button>
+
 
   </div>
   <div>
@@ -116,7 +132,7 @@
   <!-- Mensaje si no hay resultados -->
   @if (listaPokemon.length === 0) {
     <div>
-      <p class="text-center">Aún no hay Pokémon :O</p>
+      <p class="text-center">Aún no hay Pokémon :[</p>
     </div>
   }
 

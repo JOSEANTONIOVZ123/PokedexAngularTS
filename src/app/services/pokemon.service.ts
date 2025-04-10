@@ -13,7 +13,7 @@ export class PokemonService {
   constructor(private http: HttpClient) {}
 
   //conexion api
-  listaPokemon(limit: number = 1026): Observable<Pokemon[]>{
+  listaPokemon(limit: number = 1025): Observable<Pokemon[]>{
       return this.http.get<any>(`${this.baseUrl}/pokemon?limit=${limit}`).pipe(
         map(response => response.results),
         switchMap((results: any[]) =>{

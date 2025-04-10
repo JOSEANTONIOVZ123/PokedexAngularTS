@@ -10,67 +10,78 @@ import { catchError, of } from 'rxjs';
   selector: 'app-pokemon',
   imports: [CommonModule, FormsModule],
   templateUrl: './pokemon.component.html',
-  styleUrl: './pokemon.component.css'
+  styleUrls: ['./pokemon.component.css']
 })
 export class PokemonComponent implements OnInit {
   listaPokemon: Pokemon[] = [];
-  listaPrimera: Pokemon[] =[];
-  listaTipos: Pokemon[] =[];
-  buscador: string=""; // para el ngModule
-  mostrarBrillantes=false;
-  mostrarLegendarios=false;
+  listaPrimera: Pokemon[] = [];
+  listaTipos: Pokemon[] = [];
+  buscador: string = ""; // para el ngModule
+  mostrarBrillantes = false;
+  mostrarLegendarios = false;
+  mostrarMitico= false;
   listaPokemonOriginal: Pokemon[] = [];
-  arriba:string='';
+  arriba: string = '';
+
   constructor(private pokemonService: PokemonService) {}
 
-  //para inicializarlo nada mas empezar
+  // Inicializa el componente
   ngOnInit(): void {
     this.listaPokemons();
   }
 
-  //funcion para mostrar los 151 pokemons o los que haya
+  // Función para mostrar los 151 Pokémon o los que haya
   listaPokemons() {
-    if (this.listaPrimera.length === 0) {
-      this.pokemonService.listaPokemon(10000000).subscribe(pokemon => {
-        this.listaPokemon = pokemon;
-        this.listaPokemonOriginal = pokemon;
+      this.pokemonService.listaPokemon(151).subscribe(pokemon => {
+        // Se guarda la lista original y la de la primera carga
         this.listaPrimera = pokemon;
+        this.listaPokemonOriginal = pokemon;
         this.arriba = "Todos";
+        //para quitar los pokemon que no tiene imagen
+        this.listaPokemon = this.filtrarConImagen(pokemon);
+        if (this.mostrarLegendarios) {
+          //filtro de legendarios
+           const requests = pokemon.map(p =>
+             this.pokemonService.pokemonLegendarios(p.id).pipe(
+               catchError(() => of(null))
+             )
+           );
+
+           forkJoin(requests).subscribe(lista => {
+             const legendarios = lista
+               .map((data, index) => ({
+                 isLegendary: data?.is_legendary,
+                 pokemon: pokemon[index]
+               }))
+               .filter(item => item.isLegendary)
+               .map(item => item.pokemon);
+
+             this.listaPokemon = this.filtrarConImagen(legendarios);
+             this.listaPokemonOriginal = legendarios;
+           });
+         } else {
+           // Si no filtra legendarios, se muestran todos con imagen
+           this.listaPokemon = this.filtrarConImagen(pokemon);
+         }
+
       });
-    } else {
-      this.listaPokemon = this.listaPrimera;
-      this.listaPokemonOriginal = this.listaPrimera;
-      this.arriba = "Todos";
-    }
   }
 
-
-
-  //funcion para cuando le llegue un registro busque un pokemon por nombre
-  buscarPorNombre(valor:string){
-    //primero evitamos las mayusculas y los espacios
+  // Función para buscar un Pokémon por nombre
+  buscarPorNombre(valor: string) {
     const nombre = valor.trim().toLowerCase();
-    //si no devuelve nada no escribe nada
-    if (!nombre){
-      this.listaPokemon=this.listaPokemonOriginal;
+    if (!nombre) {
+      this.listaPokemon = this.filtrarConImagen(this.listaPokemonOriginal);
       return;
-
     }
-    //con esto saco un pokemon por su nombre y todas sus estadisticas
-
-    this.listaPokemon = this.listaPokemonOriginal.filter(p =>
-      p.name.toLowerCase().includes(nombre)
-
+    this.listaPokemon = this.filtrarConImagen(
+      this.listaPokemonOriginal.filter(p =>
+        p.name.toLowerCase().includes(nombre)
+      )
     );
-    // this.pokemonService.pokemonPorNombre(nombre).subscribe({
-    //   next: (pokemon: Pokemon) => {
-    //     this.listaPokemon = [pokemon];
-    //   }
-    // });
   }
 
-
-  //funcion botones por tipos
+  // Función para mostrar Pokémon por tipo
   botonesTipos(valor: string) {
     this.pokemonService.listaPokemonTipo(valor).subscribe(pokemon => {
       this.listaTipos = pokemon;
@@ -78,14 +89,15 @@ export class PokemonComponent implements OnInit {
       this.arriba = valor;
 
       if (this.mostrarLegendarios) {
+       //filtro de legendarios
         const requests = pokemon.map(p =>
           this.pokemonService.pokemonLegendarios(p.id).pipe(
             catchError(() => of(null))
           )
         );
 
-        forkJoin(requests).subscribe(speciesList => {
-          const legendarios = speciesList
+        forkJoin(requests).subscribe(lista => {
+          const legendarios = lista
             .map((data, index) => ({
               isLegendary: data?.is_legendary,
               pokemon: pokemon[index]
@@ -93,64 +105,79 @@ export class PokemonComponent implements OnInit {
             .filter(item => item.isLegendary)
             .map(item => item.pokemon);
 
-          this.listaPokemon = legendarios;
+          this.listaPokemon = this.filtrarConImagen(legendarios);
           this.listaPokemonOriginal = legendarios;
         });
-      } else {
-        this.listaPokemon = pokemon;
+      } else if (this.mostrarMitico) {
+        //filtro de legendarios
+         const requests = pokemon.map(p =>
+           this.pokemonService.pokemonLegendarios(p.id).pipe(
+             catchError(() => of(null))
+           )
+         );
+
+         forkJoin(requests).subscribe(lista => {
+           const legendarios = lista
+             .map((data, index) => ({
+               isMitical: data?.is_mythical,
+               pokemon: pokemon[index]
+             }))
+             .filter(item => item.isMitical)
+             .map(item => item.pokemon);
+
+           this.listaPokemon = this.filtrarConImagen(legendarios);
+           this.listaPokemonOriginal = legendarios;
+         });
+        }else {
+        // Si no filtra legendarios, se muestran todos con imagen
+        this.listaPokemon = this.filtrarConImagen(pokemon);
       }
+
+
     });
   }
 
-
-
-  //
-    Mostrarshiny() {
-      this.mostrarBrillantes=!this.mostrarBrillantes
+  // Función para mostrar los SHINYYYYY!!!!
+  Mostrarshiny() {
+    this.mostrarBrillantes = !this.mostrarBrillantes;
   }
 
-
+  // Función para filtrar Pokémon legendarios
   botonLegendario() {
-      this.mostrarLegendarios=!this.mostrarLegendarios
+    this.mostrarLegendarios = !this.mostrarLegendarios;
 
+    if (this.mostrarLegendarios === true) {
+      const requests = this.listaPokemonOriginal.map(p =>
+        this.pokemonService.pokemonLegendarios(p.id).pipe(
+          catchError(() => of(null))
+        )
+      );
 
-    if (this.mostrarLegendarios==true) {
-    const requests = this.listaPokemonOriginal.map(p =>
-      this.pokemonService.pokemonLegendarios(p.id).pipe(
-        catchError(() => of(null))
-      )
-    );
+      forkJoin(requests).subscribe(lista => {
+        const legendarios = lista
+          .map((data, index) => ({
+            isLegendary: data?.is_legendary,
+            pokemon: this.listaPokemonOriginal[index]
+          }))
+          .filter(item => item.isLegendary)
+          .map(item => item.pokemon);
 
-    forkJoin(requests).subscribe(speciesList => {
-      const legendarios = speciesList
-        .map((data, index) => ({
-          isLegendary: data?.is_legendary,
-          pokemon: this.listaPokemonOriginal[index]
-        }))
-        .filter(item => item.isLegendary)
-        .map(item => item.pokemon);
-
-      this.listaPokemon = legendarios;
-      this.listaPokemonOriginal = legendarios;
-
-    });
-
-
-    }else{
-      if (this.arriba == 'Todos') {
-        this.listaPokemon=this.listaPrimera
-      }else{
-        this.listaPokemon = this.listaTipos;
+        this.listaPokemon = this.filtrarConImagen(legendarios);
+        this.listaPokemonOriginal = legendarios;
+      });
+    } else {
+      // Al desactivar el filtro, se restablece la lista según el contexto
+      if (this.arriba === 'Todos') {
+        this.listaPokemon = this.filtrarConImagen(this.listaPrimera);
+        this.listaPokemonOriginal = this.listaPrimera;
+      } else {
+        this.listaPokemon = this.filtrarConImagen(this.listaTipos);
+        this.listaPokemonOriginal = this.listaTipos;
       }
     }
   }
 
-
-
-
-
-
-  //para las traducciones
+  // Traducciones de tipos
   tipoTraducido: { [key: string]: string } = {
     grass: 'Planta',
     fire: 'Fuego',
@@ -172,6 +199,7 @@ export class PokemonComponent implements OnInit {
     steel: 'Acero'
   };
 
+  // Traducciones de estadísticas
   statTraducida: { [key: string]: string } = {
     hp: 'PS',
     attack: 'Ataque',
@@ -180,6 +208,57 @@ export class PokemonComponent implements OnInit {
     'special-defense': 'Defensa Esp',
     speed: 'Velocidad'
   };
+
+  // Función para filtrar los Pokémon que no tienen imagen válida
+  filtrarConImagen(lista: Pokemon[]): Pokemon[] {
+    return lista.filter(pokemon =>
+      pokemon.image && pokemon.image.trim() !== '' && !pokemon.image.includes('undefined')
+    );
+  }
+
+  //misma funcion que el botonLegendario
+  pokemonMitico(){
+
+
+    this.mostrarMitico = !this.mostrarMitico;
+
+    if (this.mostrarMitico === true) {
+      const requests = this.listaPokemonOriginal.map(p =>
+        this.pokemonService.pokemonLegendarios(p.id).pipe(
+          catchError(() => of(null))
+        )
+      );
+
+      forkJoin(requests).subscribe(lista => {
+        const legendarios = lista
+          .map((data, index) => ({
+            isMitical: data?.is_mythical,
+            pokemon: this.listaPokemonOriginal[index]
+          }))
+          .filter(item => item.isMitical)
+          .map(item => item.pokemon);
+
+        this.listaPokemon = this.filtrarConImagen(legendarios);
+        this.listaPokemonOriginal = legendarios;
+      });
+    } else {
+      // Al desactivar el filtro, se restablece la lista según el contexto
+      if (this.arriba === 'Todos') {
+        this.listaPokemon = this.filtrarConImagen(this.listaPrimera);
+        this.listaPokemonOriginal = this.listaPrimera;
+      } else {
+        this.listaPokemon = this.filtrarConImagen(this.listaTipos);
+        this.listaPokemonOriginal = this.listaTipos;
+      }
+    }
+  }
+
+
+
+
+
+
+
 
 
 
