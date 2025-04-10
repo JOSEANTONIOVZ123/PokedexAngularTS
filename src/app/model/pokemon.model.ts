@@ -5,4 +5,6 @@ export interface Pokemon {
   imageshiny:string;
   types: string[];
   stats: { name: string; value: number }[];
+  isLegendary?: boolean;
+  isMythical?: boolean;
 }

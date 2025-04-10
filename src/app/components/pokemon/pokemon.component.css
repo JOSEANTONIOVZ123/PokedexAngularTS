@@ -115,3 +115,125 @@
   border: none;
   padding:0.2 1em;
 }
+
+
+
+.tipo-container input[type="radio"] {
+  display: none;
+}
+
+.tipo-container label {
+  display: inline-block;
+  cursor: pointer;
+  text-align: center;
+}
+
+.tipo-container label img {
+  width: 50px; /* Ajusta el tamaño según sea necesario */
+  height: 50px;
+  display: block;
+  margin: 0 auto;
+}
+
+.tipo-container input[type="radio"]:checked + label {
+  border: 2px solid #000; /* Indica la selección */
+}
+
+.tipo-btn {
+  padding: 0;
+  margin: 0;
+  border: none;
+  display: inline-block;
+  line-height: 0;
+  cursor: pointer;
+}
+
+.tipo-btn img {
+  display: block;
+  width: 96px; /* ajusta este valor para hacerla más grande o más pequeña */
+  height: auto;
+}
+
+
+.btn-check:checked + .tipo-btn img {
+  outline: 4px solid #0d6efd;
+  outline-offset: -4px;
+}
+
+.btn-check:disabled + .tipo-btn {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.masterball-btn {
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+  padding: 6px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background-color: white;
+  transition: all 0.2s ease-in-out;
+}
+
+.masterball-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+/* Activo (cuando el checkbox está marcado) */
+.btn-check:checked + .masterball-btn {
+  border-color: #b25aff;
+  box-shadow: 0 0 10px #b25aff;
+}
+
+
+.mitico-btn {
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+  padding: 6px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background-color: white;
+  transition: all 0.2s ease-in-out;
+}
+
+.mitico-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+/* Activo (cuando el checkbox está marcado) */
+.btn-check:checked + .mitico-btn {
+  border-color: #ff69b4; /* Rosa brillante */
+  box-shadow: 0 0 10px #ff69b4;
+}
+
+.shiny-btn {
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+  padding: 6px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background-color: white;
+  transition: all 0.2s ease-in-out;
+}
+
+.shiny-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+/* Brillo al seleccionar */
+.btn-check:checked + .shiny-btn {
+  border-color: gold;
+  box-shadow: 0 0 10px gold;
+}

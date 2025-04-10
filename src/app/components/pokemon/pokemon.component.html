@@ -10,45 +10,221 @@
   <!-- Botones -->
   <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
     <button class="btn btn-outline-dark" (click)="listaPokemons()">Todos</button>
-    <button class="btn btn-outline-success" (click)="botonesTipos('grass')">Planta</button>
-    <button class="btn btn-outline-secondary" (click)="botonesTipos('bug')">Bicho</button>
-    <button class="btn btn-outline-primary" (click)="botonesTipos('water')">Agua</button>
-    <button class="btn btn-outline-info" (click)="botonesTipos('ice')">Hielo</button>
-    <button class="btn btn-outline-danger" (click)="botonesTipos('fire')">Fuego</button>
-    <button class="btn btn-outline-grey text-black" (click)="botonesTipos('steel')">Acero</button>
-    <button class="btn btn-outline-brown" (click)="botonesTipos('ground')">Tierra</button>
-    <button class="btn btn-outline-primary" (click)="botonesTipos('flying')">Aire</button>
-    <button class="btn btn-outline-warning" (click)="botonesTipos('electric')">Eléctrico</button>
-    <button class="btn btn-outline-secondary" (click)="botonesTipos('normal')">Normal</button>
-    <button class="btn btn-outline-brown" (click)="botonesTipos('rock')">Roca</button>
-    <button class="btn btn-outline-danger" (click)="botonesTipos('psychic')">Psíquico</button>
-    <button class="btn btn-outline-primary" (click)="botonesTipos('dragon')">Dragón</button>
-    <button class="btn btn-outline-purple" (click)="botonesTipos('ghost')">Fantasma</button>
-    <button class="btn btn-outline-purple" (click)="botonesTipos('poison')">Veneno</button>
-    <button class="btn btn-outline-warning" (click)="botonesTipos('fighting')">Lucha</button>
-    <button class="btn btn-outline-pink" (click)="botonesTipos('fairy')">Hada</button>
-    <button class="btn btn-outline-dark"  (click)="botonesTipos('dark')">Siniestro</button>
-    <button class="btn btn-outline-warning d-flex align-items-center gap-2" (click)="Mostrarshiny()">
-      <input type="checkbox" [checked]="mostrarBrillantes" />
-      Brillantes
-    </button>
-<!-- Botón Legendarios -->
-<button
-  class="btn btn-outline-purple"
-  (click)="botonLegendario()"
-  [disabled]="mostrarMitico">
-  <input type="checkbox" [checked]="mostrarLegendarios" disabled />
-  Legendarios
-</button>
 
-<!-- Botón Míticos -->
-<button
-  class="btn btn-outline-purple"
-  (click)="pokemonMitico()"
-  [disabled]="mostrarLegendarios">
-  <input type="checkbox" [checked]="mostrarMitico" disabled />
-  Miticos
-</button>
+<!-- Planta -->
+<input type="checkbox" class="btn-check" id="tipo-grass"
+  (change)="botonesTipos('grass')"
+  [checked]="tiposActivos.includes('grass')"
+  [disabled]="(!tiposActivos.includes('grass') && tiposActivos.length === 2) || (!tiposDisponibles.has('grass') && !tiposActivos.includes('grass'))">
+<label class="tipo-btn" for="tipo-grass">
+  <img src="https://www.serebii.net/pokedex-bw/type/grass.gif" alt="Planta">
+</label>
+
+<!-- Fuego -->
+<input type="checkbox" class="btn-check" id="tipo-fire"
+  (change)="botonesTipos('fire')"
+  [checked]="tiposActivos.includes('fire')"
+  [disabled]="(!tiposActivos.includes('fire') && tiposActivos.length === 2) || (!tiposDisponibles.has('fire') && !tiposActivos.includes('fire'))">
+<label class="tipo-btn" for="tipo-fire">
+  <img src="https://www.serebii.net/pokedex-bw/type/fire.gif" alt="Fuego">
+</label>
+
+<!-- Agua -->
+<input type="checkbox" class="btn-check" id="tipo-water"
+  (change)="botonesTipos('water')"
+  [checked]="tiposActivos.includes('water')"
+  [disabled]="(!tiposActivos.includes('water') && tiposActivos.length === 2) || (!tiposDisponibles.has('water') && !tiposActivos.includes('water'))">
+<label class="tipo-btn" for="tipo-water">
+  <img src="https://www.serebii.net/pokedex-bw/type/water.gif" alt="Agua">
+</label>
+
+<!-- Bicho -->
+<input type="checkbox" class="btn-check" id="tipo-bug"
+  (change)="botonesTipos('bug')"
+  [checked]="tiposActivos.includes('bug')"
+  [disabled]="(!tiposActivos.includes('bug') && tiposActivos.length === 2) || (!tiposDisponibles.has('bug') && !tiposActivos.includes('bug'))">
+<label class="tipo-btn" for="tipo-bug">
+  <img src="https://www.serebii.net/pokedex-bw/type/bug.gif" alt="Bicho">
+</label>
+
+<!-- Normal -->
+<input type="checkbox" class="btn-check" id="tipo-normal"
+  (change)="botonesTipos('normal')"
+  [checked]="tiposActivos.includes('normal')"
+  [disabled]="(!tiposActivos.includes('normal') && tiposActivos.length === 2) || (!tiposDisponibles.has('normal') && !tiposActivos.includes('normal'))">
+<label class="tipo-btn" for="tipo-normal">
+  <img src="https://www.serebii.net/pokedex-bw/type/normal.gif" alt="Normal">
+</label>
+
+<!-- Volador -->
+<input type="checkbox" class="btn-check" id="tipo-flying"
+  (change)="botonesTipos('flying')"
+  [checked]="tiposActivos.includes('flying')"
+  [disabled]="(!tiposActivos.includes('flying') && tiposActivos.length === 2) || (!tiposDisponibles.has('flying') && !tiposActivos.includes('flying'))">
+<label class="tipo-btn" for="tipo-flying">
+  <img src="https://www.serebii.net/pokedex-bw/type/flying.gif" alt="Aire">
+</label>
+
+<!-- Veneno -->
+<input type="checkbox" class="btn-check" id="tipo-poison"
+  (change)="botonesTipos('poison')"
+  [checked]="tiposActivos.includes('poison')"
+  [disabled]="(!tiposActivos.includes('poison') && tiposActivos.length === 2) || (!tiposDisponibles.has('poison') && !tiposActivos.includes('poison'))">
+<label class="tipo-btn" for="tipo-poison">
+  <img src="https://www.serebii.net/pokedex-bw/type/poison.gif" alt="Veneno">
+</label>
+
+<!-- Eléctrico -->
+<input type="checkbox" class="btn-check" id="tipo-electric"
+  (change)="botonesTipos('electric')"
+  [checked]="tiposActivos.includes('electric')"
+  [disabled]="(!tiposActivos.includes('electric') && tiposActivos.length === 2) || (!tiposDisponibles.has('electric') && !tiposActivos.includes('electric'))">
+<label class="tipo-btn" for="tipo-electric">
+  <img src="https://www.serebii.net/pokedex-bw/type/electric.gif" alt="Eléctrico">
+</label>
+
+<!-- Tierra -->
+<input type="checkbox" class="btn-check" id="tipo-ground"
+  (change)="botonesTipos('ground')"
+  [checked]="tiposActivos.includes('ground')"
+  [disabled]="(!tiposActivos.includes('ground') && tiposActivos.length === 2) || (!tiposDisponibles.has('ground') && !tiposActivos.includes('ground'))">
+<label class="tipo-btn" for="tipo-ground">
+  <img src="https://www.serebii.net/pokedex-bw/type/ground.gif" alt="Tierra">
+</label>
+
+<!-- Hada -->
+<input type="checkbox" class="btn-check" id="tipo-fairy"
+  (change)="botonesTipos('fairy')"
+  [checked]="tiposActivos.includes('fairy')"
+  [disabled]="(!tiposActivos.includes('fairy') && tiposActivos.length === 2) || (!tiposDisponibles.has('fairy') && !tiposActivos.includes('fairy'))">
+<label class="tipo-btn" for="tipo-fairy">
+  <img src="https://www.serebii.net/pokedex-bw/type/fairy.gif" alt="Hada">
+</label>
+
+<!-- Lucha -->
+<input type="checkbox" class="btn-check" id="tipo-fighting"
+  (change)="botonesTipos('fighting')"
+  [checked]="tiposActivos.includes('fighting')"
+  [disabled]="(!tiposActivos.includes('fighting') && tiposActivos.length === 2) || (!tiposDisponibles.has('fighting') && !tiposActivos.includes('fighting'))">
+<label class="tipo-btn" for="tipo-fighting">
+  <img src="https://www.serebii.net/pokedex-bw/type/fighting.gif" alt="Lucha">
+</label>
+
+<!-- Psíquico -->
+<input type="checkbox" class="btn-check" id="tipo-psychic"
+  (change)="botonesTipos('psychic')"
+  [checked]="tiposActivos.includes('psychic')"
+  [disabled]="(!tiposActivos.includes('psychic') && tiposActivos.length === 2) || (!tiposDisponibles.has('psychic') && !tiposActivos.includes('psychic'))">
+<label class="tipo-btn" for="tipo-psychic">
+  <img src="https://www.serebii.net/pokedex-bw/type/psychic.gif" alt="Psíquico">
+</label>
+
+<!-- Roca -->
+<input type="checkbox" class="btn-check" id="tipo-rock"
+  (change)="botonesTipos('rock')"
+  [checked]="tiposActivos.includes('rock')"
+  [disabled]="(!tiposActivos.includes('rock') && tiposActivos.length === 2) || (!tiposDisponibles.has('rock') && !tiposActivos.includes('rock'))">
+<label class="tipo-btn" for="tipo-rock">
+  <img src="https://www.serebii.net/pokedex-bw/type/rock.gif" alt="Roca">
+</label>
+
+<!-- Hielo -->
+<input type="checkbox" class="btn-check" id="tipo-ice"
+  (change)="botonesTipos('ice')"
+  [checked]="tiposActivos.includes('ice')"
+  [disabled]="(!tiposActivos.includes('ice') && tiposActivos.length === 2) || (!tiposDisponibles.has('ice') && !tiposActivos.includes('ice'))">
+<label class="tipo-btn" for="tipo-ice">
+  <img src="https://www.serebii.net/pokedex-bw/type/ice.gif" alt="Hielo">
+</label>
+
+<!-- Fantasma -->
+<input type="checkbox" class="btn-check" id="tipo-ghost"
+  (change)="botonesTipos('ghost')"
+  [checked]="tiposActivos.includes('ghost')"
+  [disabled]="(!tiposActivos.includes('ghost') && tiposActivos.length === 2) || (!tiposDisponibles.has('ghost') && !tiposActivos.includes('ghost'))">
+<label class="tipo-btn" for="tipo-ghost">
+  <img src="https://www.serebii.net/pokedex-bw/type/ghost.gif" alt="Fantasma">
+</label>
+
+<!-- Dragón -->
+<input type="checkbox" class="btn-check" id="tipo-dragon"
+  (change)="botonesTipos('dragon')"
+  [checked]="tiposActivos.includes('dragon')"
+  [disabled]="(!tiposActivos.includes('dragon') && tiposActivos.length === 2) || (!tiposDisponibles.has('dragon') && !tiposActivos.includes('dragon'))">
+<label class="tipo-btn" for="tipo-dragon">
+  <img src="https://www.serebii.net/pokedex-bw/type/dragon.gif" alt="Dragón">
+</label>
+
+<!-- Siniestro -->
+<input type="checkbox" class="btn-check" id="tipo-dark"
+  (change)="botonesTipos('dark')"
+  [checked]="tiposActivos.includes('dark')"
+  [disabled]="(!tiposActivos.includes('dark') && tiposActivos.length === 2) || (!tiposDisponibles.has('dark') && !tiposActivos.includes('dark'))">
+<label class="tipo-btn" for="tipo-dark">
+  <img src="https://www.serebii.net/pokedex-bw/type/dark.gif" alt="Siniestro">
+</label>
+
+<!-- Acero -->
+<input type="checkbox" class="btn-check" id="tipo-steel"
+  (change)="botonesTipos('steel')"
+  [checked]="tiposActivos.includes('steel')"
+  [disabled]="(!tiposActivos.includes('steel') && tiposActivos.length === 2) || (!tiposDisponibles.has('steel') && !tiposActivos.includes('steel'))">
+<label class="tipo-btn" for="tipo-steel">
+  <img src="https://www.serebii.net/pokedex-bw/type/steel.gif" alt="Acero">
+</label>
+
+
+
+<!--shiny -->
+<input
+  type="checkbox"
+  class="btn-check"
+  id="tipo-shiny"
+  (change)="Mostrarshiny()"
+  [checked]="mostrarBrillantes"
+/>
+<label class="shiny-btn" for="tipo-shiny" title="Brillantes">
+  <img
+    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/25.gif"
+    alt="Shiny"
+  />
+</label>
+
+
+<!-- Legendarios (Master Ball redondeado) -->
+<input
+  type="checkbox"
+  class="btn-check"
+  id="tipo-legendarios"
+  (change)="botonLegendario()"
+  [checked]="mostrarLegendarios"
+  [disabled]="mostrarMitico"
+/>
+<label class="masterball-btn" for="tipo-legendarios" title="Legendarios">
+  <img
+    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png"
+    alt="Legendarios"
+  />
+</label>
+
+
+
+
+<input
+  type="checkbox"
+  class="btn-check"
+  id="tipo-miticos"
+  (change)="pokemonMitico()"
+  [checked]="mostrarMitico"
+  [disabled]="mostrarLegendarios"
+/>
+<label class="mitico-btn" for="tipo-miticos" title="Míticos">
+  <img
+    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/151.gif"
+    alt="Míticos"
+/>
+</label>
+
 
 
   </div>
@@ -56,6 +232,16 @@
     <p class="text-center">Bucando {{arriba}}</p>
 
   </div>
+  <p class="">
+    <input type="checkbox"
+    (click)="tiposBusqueda()"
+    >
+    @if (tipoBusqueda == true) {
+      Busqueda desde el inicio
+    }@else {
+      Busqueda que contenga
+    }
+  </p>
 
   <!-- Buscador -->
   <div class="input-group mb-4">
