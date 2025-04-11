@@ -1,0 +1,46 @@
+.pokedex-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.pokedex-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Ya existente */
+.pokemon-marco {
+  width: 220px;
+  height: 220px;
+  background-image: url('https://us.123rf.com/450wm/thvideo/thvideo2303/thvideo230333338/200217575-fondo-de-naturaleza-de-paisaje-de-bosque-de-anime-hermosos-%C3%A1rboles-con-hierba-verde-al-estilo-anime.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 3px solid #ccc;
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pokemon-img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+}
+
+.todo{
+  background-image: url('https://i.pinimg.com/originals/85/65/e9/8565e9edb2207dbdd46b666b32568ade.gif');
+  background-size: cover;
+  background-position: center;
+}
+.informacion{
+  background-color: white;
+  text-align: center;
+  opacity: 0.9;
+  color: black;
+  border-radius: 20px;
+}

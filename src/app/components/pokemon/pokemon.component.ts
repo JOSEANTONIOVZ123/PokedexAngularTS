@@ -3,255 +3,266 @@ import { PokemonService } from '../../services/pokemon.service';
 import { Pokemon } from '../../model/pokemon.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
-import { catchError, of } from 'rxjs';
+import { forkJoin, of, tap } from 'rxjs';
+import { catchError } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-pokemon',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './pokemon.component.html',
   styleUrls: ['./pokemon.component.css']
 })
 export class PokemonComponent implements OnInit {
-  listaPokemon: Pokemon[] = [];
-  listaPrimera: Pokemon[] = [];
-  listaTipos: Pokemon[] = [];
-  listaOriginal: Pokemon[] = [];
-  listaFiltrada: Pokemon[] = [];
-  tiposActivos: string[] = [];
+  listaPrimera: Pokemon[] =[]; //Lista para guardar los 1025 pokemon en Todos.
+  listaPokemon: Pokemon[] = []; //lista principal donde se escribira Todo en el html.
+  listaOriginal: Pokemon[] = []; //listaOriginal sirve como array de apoyo a la hora de recibir varios datos y así no perder informacion si se mueve uno mucho hacia delante y hacia atras.
+  listaFiltrada: Pokemon[] = []; //Una lista donde despues de todos los filtros este se convierta en la listaPokemon
+  tiposActivos: string[] = []; //array de pokemons para los tipos pokemon activos
 
+  buscador: string = ''; // para coger el string de busqueda del httml
+  tipoBusqueda = false; // para cambiar entre tipos de busqueda
+  mostrarBrillantes = false; //para cambiar entre shiny o no.
+  mostrarLegendarios = false; // para cambiar entre legendarios o no
+  mostrarMitico = false; // para cambiar entre mitico o no
+  arriba: string = ''; // arriba es basicamente un nombre para que cada vez que se busque un tipo este se muestre en httml
 
+   //un set para poder hacer posible la busqueda por dos tipos
+  tiposDisponibles: Set<string> = new Set(); //aparte sirve para poder desactivar los botones si estos no estan disponibles
 
-  buscador: string = ""; // para el ngModule
-  tipoBusqueda=false;
-  mostrarBrillantes = false;
-  mostrarLegendarios = false;
-  mostrarMitico= false;
-  listaPokemonOriginal: Pokemon[] = [];
-  arriba: string = '';
+  //cacheTipos es para evitar que se haga mas de una peticion a la api
+  private cacheTipos: Map<string, Pokemon[]> = new Map(); //aunque con la funcion filtros() esto no aplica y debo cambiarlo.
 
-  constructor(private pokemonService: PokemonService) {}
+  //constructor :p
+  constructor(private pokemonService: PokemonService, private router: Router) {}
 
-  // Inicializa el componente
+  //para inicializar desde el inicio la listaPokemon y este se guarde en
   ngOnInit(): void {
-    this.listaPokemons();
-    this.buscador = "";
-    this.mostrarLegendarios = false;
-    this.mostrarMitico = false;
+    this.listaPokemons(); //inicializamos listaPokemon nada mas aunque no es necesario.
   }
 
-  // Función para mostrar los 151 Pokémon o los que haya
+  //Para escribir la lista de pokemons original y el if es para que si ya esta guardada
+  //en listaPrimera pues este no hace ninguna peticion.
   listaPokemons() {
-    this.pokemonService.listaPokemon(151).subscribe(pokemon => {
-      // Filtra Pokémon con imagen válida
-      const conImagen = this.filtrarConImagen(pokemon);
-
-      // Guarda la lista original para reiniciar cuando haga falta
-      this.listaOriginal = conImagen;
-      this.listaFiltrada = [...this.listaOriginal];
-
-      // Limpia cualquier estado previo
-      this.arriba = "Todos";
-
-
-      // Aplica los filtros activos si los hay (por ahora no, pero si usas reinicio o navegación futura sí)
-      this.filtros();
-      this.tiposDisponibles = new Set(Object.keys(this.tipoTraducido)); // Habilita todos los botones
-
+    //Primera peticion si no contiene nada la primera lista
+    if (this.listaPrimera.length === 0) {
+      this.pokemonService.listaPokemon(151).subscribe(pokemon => {
+        const conImagen = this.filtrarConImagen(pokemon);
+        this.listaOriginal = conImagen;
+        this.listaFiltrada = [...this.listaOriginal];
+        this.arriba = 'Todos';
+        this.filtros(); //Filtra por legendarios o miticos
+        this.tiposDisponibles = new Set(Object.keys(this.tipoTraducido));
     });
+    //si ya hay datos pues se pone y listo y ya se le puede hacer los filtros oportunos
+    }else{
+        this.listaOriginal = this.listaPrimera;
+        this.listaFiltrada = [...this.listaOriginal];
+        this.arriba = 'Todos';
+        this.filtros(); //Filtra por legendarios o miticos
+        this.tiposDisponibles = new Set(Object.keys(this.tipoTraducido));
+    }
+
   }
 
-
+  //Otra funcion dificil de explicar.
+  //Basicamente esta funcion hace un pipe a pokemonLegendarios que esta en service y este filtra depende si cada pokemon
+  //contiene ok en el mapa es decir si es legendario o mitico y si es así este se aplica a la listaFiltrada.
   filtros() {
-    let resultado = [...this.listaFiltrada];
+    let resultado = [...this.listaFiltrada]; //creamos un resultado
 
-    // Si hay filtro de legendarios/míticos, hacemos peticiones
-    if (this.mostrarLegendarios || this.mostrarMitico) {
+    if (this.mostrarLegendarios || this.mostrarMitico) { //si uno de los dos esta activo empieza la busqueda sino hace la busqueda en else
       const requests = resultado.map(p =>
-        this.pokemonService.pokemonLegendarios(p.id).pipe(
-          catchError(() => of(null))
+        this.pokemonService.pokemonLegendarios(p.id).pipe( //sacamos todos los pokemons por su id el cual es importante por id porque hay pokemons de /pokemon-species que no son iguales de /pokemon
+          catchError(() => of(null)) //pillamos si hay un error
         )
       );
-
+      //Bendito forkJoin gracias a esto se logra todo esto.
       forkJoin(requests).subscribe(lista => {
-        const filtrados = lista
+        const filtrados = lista //creamos una listita
           .map((data, index) => ({
-            ok: this.mostrarLegendarios ? data?.is_legendary : data?.is_mythical,
+            ok: this.mostrarLegendarios ? data?.is_legendary : data?.is_mythical, // si legendarios contiene estos dos valores entonces es ok y sigue, sino da error aunque debería controlar ese error, ya funciona
             pokemon: resultado[index]
           }))
-          .filter(item => item.ok)
-          .map(item => item.pokemon);
-
-        // ✅ Aquí aplicamos también la búsqueda
-        let final = filtrados;
-
-        if (this.buscador && this.buscador.trim() !== '') {
-          const nombre = this.buscador.toLowerCase();
-          final = final.filter(p =>
-            this.tipoBusqueda
-              ? p.name.toLowerCase().startsWith(nombre)
-              : p.name.toLowerCase().includes(nombre)
-          );
-        }
-
-        this.listaPokemon = final;
+          .filter(p => p.ok) // se filtra si el p es oki doki
+          .map(p => p.pokemon);
+          //importante esto hace que tambien commpruebe si el buscador esta buscando
+        this.listaPokemon = this.aplicarBusqueda(filtrados);
       });
     } else {
-      // ✅ Si no hay legendarios/míticos, aplicamos directamente búsqueda
-      if (this.buscador && this.buscador.trim() !== '') {
-        const nombre = this.buscador.toLowerCase();
-        resultado = resultado.filter(p =>
-          this.tipoBusqueda
-            ? p.name.toLowerCase().startsWith(nombre)
-            : p.name.toLowerCase().includes(nombre)
-        );
-      }
-
-      this.listaPokemon = resultado;
-    }
+       //importante esto hace que tambien commpruebe si el buscador esta buscando
+      this.listaPokemon = this.aplicarBusqueda(resultado);
+    } //finalmente explicado
   }
 
+  //función para buscar pokemon
+  aplicarBusqueda(lista: Pokemon[]): Pokemon[] {
+    if (!this.buscador.trim()) return lista;
+    const nombre = this.buscador.toLowerCase(); //importante que este en minusculas
+    return lista.filter(p =>
+      this.tipoBusqueda
+        ? p.name.toLowerCase().startsWith(nombre)  //Podría haber hecho un if pero sinceramente me parece mas pulcro de esta manera.
+        : p.name.toLowerCase().includes(nombre)
+    );
+  }
 
-
-
-
-  // Función para buscar un Pokémon por nombre
+  //Pues buscar por nombre usando otra vez los filtros (incluye si legendarios o miticos esta activo)
   buscarPorNombre(valor: string) {
-    this.buscador = valor.trim().toLowerCase();
+    this.buscador = valor.trim().toLowerCase(); // para poner datos en buscador y asi aplica la busqueda
     this.filtros();
   }
 
-
-
-
-
-  tiposBusqueda(){
-    this.tipoBusqueda=!this.tipoBusqueda
+  //basicamente para que un checkbox cambie y tenga funcionalidad
+  tiposBusqueda() {
+    this.tipoBusqueda = !this.tipoBusqueda;
   }
 
-
-
-
-
-  // Función para mostrar los SHINYYYYY!!!!
+  //sencillamente cambia el sprite normal por el shiny :O
   Mostrarshiny() {
     this.mostrarBrillantes = !this.mostrarBrillantes;
   }
 
-  // Función para filtrar Pokémon legendarios
+  //Muestra pokemons Legendarios usando la funcion filtros().
   botonLegendario() {
     this.mostrarLegendarios = !this.mostrarLegendarios;
-
-    if (this.mostrarLegendarios) {
-      this.mostrarMitico = false; // No pueden estar ambos activos
-    }
-
+    if (this.mostrarLegendarios) this.mostrarMitico = false;
     this.filtros();
   }
 
+  //Muestra pokemons Miticos usando la funcion filtros().
+  pokemonMitico() {
+    this.mostrarMitico = !this.mostrarMitico;
+    if (this.mostrarMitico) this.mostrarLegendarios = false;
+    this.filtros();
+  }
 
-
-  // Función para filtrar los Pokémon que no tienen imagen válida
+  //como bien dice, filtra la lista de pokemons si esta no contiene ningun tipo de imagen
   filtrarConImagen(lista: Pokemon[]): Pokemon[] {
     return lista.filter(pokemon =>
       pokemon.image && pokemon.image.trim() !== '' && !pokemon.image.includes('undefined')
     );
   }
 
-  //misma funcion que el botonLegendario
-  pokemonMitico() {
-    this.mostrarMitico = !this.mostrarMitico;
-
-    if (this.mostrarMitico) {
-      this.mostrarLegendarios = false; // No pueden estar ambos activos
-    }
-
-    this.filtros();
-  }
-
-
-
-
-  tiposDisponibles: Set<string> = new Set();
-
+  //esto es una tortura de explicar.... Lo comentaré mas tarde:
+  //botonesTipos consiste en una lista de pokemons independiente a listaPokemons debido a /pokemon-species en vez de /pokemon
   botonesTipos(tipo: string) {
+    // Primero reviso si el tipo que el usuario hizo clic ya está seleccionado
     const index = this.tiposActivos.indexOf(tipo);
-
-    // Alternar selección del tipo
     if (index >= 0) {
+      // Si ya estaba, lo quito
       this.tiposActivos.splice(index, 1);
     } else if (this.tiposActivos.length < 2) {
+      // Si no estaba y todavía no hay 2 tipos seleccionados, lo agrego
       this.tiposActivos.push(tipo);
     }
 
-    // Si no hay tipos activos, mostrar todos
+    // Si ya no hay tipos seleccionados, muestro todos los Pokémon
     if (this.tiposActivos.length === 0) {
+      // Vuelvo a activar todos los tipos como disponibles
       this.tiposDisponibles = new Set(Object.keys(this.tipoTraducido));
+      // Vuelvo a mostrar la lista original sin filtros
       this.listaFiltrada = [...this.listaOriginal];
-      this.arriba = "Todos";
+      // Cambio el texto de arriba para que diga "Todos"
+      this.arriba = 'Todos';
+      // Aplico los demás filtros (como legendarios, brillantes, etc.)
       this.filtros();
       return;
     }
 
-    // Si hay solo un tipo activo, buscar tipos compatibles con él
+    // Si solo hay un tipo seleccionado
     if (this.tiposActivos.length === 1) {
       const tipoSeleccionado = this.tiposActivos[0];
+      // Reviso si ya había guardado los Pokémon de este tipo antes (caché)
+      const cache = this.cacheTipos.get(tipoSeleccionado);
 
-      this.pokemonService.listaPokemonTipo(tipoSeleccionado).subscribe(pokemonPorTipo => {
-        const conImagen = this.filtrarConImagen(pokemonPorTipo);
-
-        // Extraer tipos compatibles (excluyendo el propio tipo seleccionado)
-        const tiposCompatibles = new Set<string>();
-        conImagen.forEach(poke => {
-          poke.types.forEach(t => {
-            if (t !== tipoSeleccionado) {
-              tiposCompatibles.add(t);
-            }
-          });
+      if (cache) {
+        // Si ya lo tenía guardado, lo uso directamente
+        const conImagen = this.filtrarConImagen(cache);
+        this.aplicarFiltroTipoUnico(tipoSeleccionado, conImagen); // usamos el filtro unico
+      } else {
+        // Si no lo tenía, hago la petición al servicio
+        this.pokemonService.listaPokemonTipo(tipoSeleccionado).subscribe(pokemonPorTipo => {
+          // Guardo los datos para no tener que pedirlos otra vez
+          this.cacheTipos.set(tipoSeleccionado, pokemonPorTipo);
+          const conImagen = this.filtrarConImagen(pokemonPorTipo);
+          this.aplicarFiltroTipoUnico(tipoSeleccionado, conImagen); //usamos el filtro unico
         });
-
-        tiposCompatibles.add(tipoSeleccionado);
-        this.tiposDisponibles = tiposCompatibles;
-                this.listaFiltrada = conImagen;
-        this.arriba = `${this.tipoTraducido[tipoSeleccionado]}`;
-        this.filtros();
-      });
-
+      }
       return;
     }
 
-    // Si hay dos tipos activos, buscar la intersección
-    const peticiones = this.tiposActivos.map(tipoActivo =>
-      this.pokemonService.listaPokemonTipo(tipoActivo).pipe(
-        catchError(() => of([])) // Por si alguna llamada falla
-      )
-    );
+    // Si hay dos tipos seleccionados, tengo que hacer dos peticiones
+    const peticiones = this.tiposActivos.map(tipoActivo => {
+      const cache = this.cacheTipos.get(tipoActivo);
+      if (cache) return of(cache); // Si ya lo tenía, lo uso
+      return this.pokemonService.listaPokemonTipo(tipoActivo).pipe(
+        tap(data => this.cacheTipos.set(tipoActivo, data)), // Guardo lo que me llega
+        catchError(() => of([])) // Si falla la petición, mando un array vacío
+      );
+    });
 
+    // forkJoin espera que terminen todas las peticiones para seguir
     forkJoin(peticiones).subscribe((respuestas: Pokemon[][]) => {
+      // Busco los Pokémon que estén en ambas respuestas (intersección)
       const interseccion = respuestas.reduce((a, b) =>
         a.filter(pokeA => b.some(pokeB => pokeB.id === pokeA.id))
       );
 
-      this.listaFiltrada = this.filtrarConImagen(interseccion);
-      this.arriba = this.tiposActivos
-        .map(tipo => this.tipoTraducido[tipo] || tipo)
-        .join(' + ');
-
-      // Solo permitir seguir mostrando los tipos activos
+      // Aplico filtro de que tengan imagen
+      const filtrados = this.filtrarConImagen(interseccion);
+      // Actualizo la lista para mostrar solo los que cumplen
+      this.listaFiltrada = filtrados;
+      // Pongo el texto de arriba con los tipos seleccionados
+      this.arriba = this.tiposActivos.map(tipo => this.tipoTraducido[tipo] || tipo).join(' + ');
+      // Solo muestro como disponibles los tipos seleccionados
       this.tiposDisponibles = new Set(this.tiposActivos);
+      // Aplico los demás filtros
       this.filtros();
     });
   }
 
 
+  //filtrar solo por un tipo
+  private aplicarFiltroTipoUnico(tipoSeleccionado: string, conImagen: Pokemon[]) {
+    // Creo un Set para guardar los tipos compatibles (sin repetir)
+    const tiposCompatibles = new Set<string>();
+
+    // Recorro cada Pokémon filtrado (que ya tienen imagen)
+    conImagen.forEach(poke => {
+      // Reviso los tipos del Pokémon
+      poke.types.forEach(t => {
+        // Si el tipo no es el que seleccionamos, lo agrego al set
+        if (t !== tipoSeleccionado) tiposCompatibles.add(t);
+      });
+    });
+
+    // Al final también agrego el tipo que está seleccionado
+    tiposCompatibles.add(tipoSeleccionado);
+
+    // Actualizo los tipos disponibles con los que encontré arriba
+    this.tiposDisponibles = tiposCompatibles;
+
+    // Guardo la lista final que se va a mostrar en pantalla
+    this.listaFiltrada = conImagen;
+
+    // Actualizo el texto de arriba con el nombre traducido del tipo
+    this.arriba = `${this.tipoTraducido[tipoSeleccionado]}`;
+
+    // Aplico los demás filtros (como brillantes, legendarios, nombre, etc.)
+    this.filtros();
+  }
 
 
 
+//para poner los iconos de los pokemons
+  getIconoTipo(tipo: string): string {
+    return `https://www.serebii.net/pokedex-bw/type/${tipo}.gif`;
+  }
 
 
-
-
-  // Traducciones de tipos
+  //Como soy un maldito flipado de pokemon he decidido hacer una traducción hecha a mano en español
+  //no me juzguen me encanta pokemon
   tipoTraducido: { [key: string]: string } = {
     grass: 'Planta',
     fire: 'Fuego',
@@ -272,8 +283,7 @@ export class PokemonComponent implements OnInit {
     dark: 'Siniestro',
     steel: 'Acero'
   };
-
-  // Traducciones de estadísticas
+  //lo mismo que en tipoTraducido
   statTraducida: { [key: string]: string } = {
     hp: 'PS',
     attack: 'Ataque',
@@ -283,5 +293,12 @@ export class PokemonComponent implements OnInit {
     speed: 'Velocidad'
   };
 
+
+  verDetalle(name: string) {
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['/informacion', name])
+    );
+    window.open(url, '_blank');
+  }
 
 }

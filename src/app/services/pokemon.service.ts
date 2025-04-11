@@ -32,6 +32,8 @@ export class PokemonService {
         name: data.name,
         image:data.sprites?.front_default ,
         imageshiny:data.sprites?.front_shiny,
+        height: data.height,
+        weight: data.weight,
         types:data.types.map((t:any) => t.type.name), //increible //Mapa dentro de otro mapa :O
         stats: data.stats.map((s:any) =>({
           name:s.stat.name,
@@ -59,9 +61,6 @@ export class PokemonService {
   pokemonLegendarios(id:number) {
     return this.http.get<any>(`${this.baseUrl}/pokemon-species/${id}`);
   }
-
-
-
 
 
 

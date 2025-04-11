@@ -9,7 +9,15 @@
 
   <!-- Botones -->
   <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
-    <button class="btn btn-outline-dark" (click)="listaPokemons()">Todos</button>
+    <input type="checkbox"
+    class="btn-check"
+    id="tipo-todos"
+    (change)="listaPokemons()"
+    [disabled]="tiposActivos.length >=1"
+    [checked]="tiposActivos.length === 0">
+<label class="btn btn-outline-dark">Todos</label>
+
+
 
 <!-- Planta -->
 <input type="checkbox" class="btn-check" id="tipo-grass"
@@ -256,9 +264,9 @@
   </div>
 
   <!-- "recycleview"-->
-  <div class="row justify-content-center">
+  <div class="row justify-content-center" >
     @for (pokemon of listaPokemon; track pokemon.name) {
-      <div class="col-md-3">
+      <div class="col-md-3" (click)="verDetalle(pokemon.name)" target="_blank">
         <div class="card h-100 shadow-sm border-0 rounded-5">
 
           <!-- Imagen del Pokémon -->
@@ -279,23 +287,30 @@
           }
 
           <!-- Datos del Pokémon -->
-          <div class="card-body text-center">
+          <div class="card-body text-center ">
             @if (pokemon.name == "victini") {
             <h3 class="card-title text-capitalize">❤️El mejor pokemon🧡</h3>
             }
             <h3 class="card-title text-capitalize">{{ pokemon.name }}</h3>
+              <!-- Tipos -->
+                <div class="mb-3 text-center">
+                    <strong class="d-block">Tipos:</strong>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
+                      @for (type of pokemon.types; track type) {
+                          <img
+                            [src]="getIconoTipo(type)"
+                            [alt]="tipoTraducido[type] || type"
+                              class="rounded"
+                                width="40"
+                               height="20"
+                                title="{{ tipoTraducido[type] || type }}"
+                                 />
+                                }
+                                </div>
+                </div>
 
-            <!-- Tipos -->
-            <div class="mb-3">
-              <strong class="d-block">Tipos:</strong>
-              @for (type of pokemon.types;track type) {
-                <span
-                  class="badge bg-secondary me-1 text-capitalize"
-                >
-                  {{ tipoTraducido[type] || type }}
-                </span>
-              }
-            </div>
+
+
 
             <!-- Estadísticas -->
             <div>

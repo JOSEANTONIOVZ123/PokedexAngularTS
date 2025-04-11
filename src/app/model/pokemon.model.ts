@@ -7,4 +7,6 @@ export interface Pokemon {
   stats: { name: string; value: number }[];
   isLegendary?: boolean;
   isMythical?: boolean;
+  height: number;
+  weight: number;
 }

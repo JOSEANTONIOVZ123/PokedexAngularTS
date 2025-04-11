@@ -1,0 +1,66 @@
+<div class="todo">
+
+
+  @if (pokemon) {
+    <div class="pokedex-wrapper">
+      <div class="pokedex-card text-center">
+
+        <!-- Imagen con fondo -->
+         @if (shinyOn==true) {
+          <div class="pokemon-marco mb-4">
+            <img
+              [src]="pokemon.imageshiny"
+              [alt]="pokemon.name"
+              class="pokemon-img"
+            />
+          </div>
+
+         }@else {
+          <div class="pokemon-marco mb-4">
+            <img
+              [src]="pokemon.image"
+              [alt]="pokemon.name"
+              class="pokemon-img"
+            />
+          </div>
+         }
+
+        <div class="informacion">
+
+          <!-- Número Pokédex -->
+          <h5 class="text-muted mb-1">#{{ pokemon.id }}</h5>
+
+          <!-- Nombre -->
+          <h1 class="text-capitalize mb-3">{{ pokemon.name }}</h1>
+
+          <!-- Descripción -->
+          <p class="fst-italic mx-auto" style="max-width: 400px;">
+            {{ descripcion }}
+          </p>
+
+          <!-- Altura y peso -->
+          <div class="d-flex justify-content-center gap-4 mt-3">
+            <div><strong>Altura:</strong> {{ altura }} m</div>
+            <div><strong>Peso:</strong> {{ peso }} kg</div>
+          </div>
+
+          <button>
+            shiny
+            <input type="checkbox" (click)="shiny()"[checked]="shinyOn">
+          </button>
+        </div>
+
+      </div>
+    </div>
+  } @else {
+    <!-- Cargando -->
+    <div class="text-center mt-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  }
+
+</div>
+
+
